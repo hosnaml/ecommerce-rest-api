@@ -1,6 +1,5 @@
 package com.hosnaml.store.controllers;
 
-import com.hosnaml.store.entities.User;
 import com.hosnaml.store.mappers.UserMapper;
 import com.hosnaml.store.repositories.UserRepository;
 import lombok.AllArgsConstructor;
@@ -9,6 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.hosnaml.store.dtos.UserDto;
 import java.util.Set;
+import com.hosnaml.store.dtos.RegisterUserRequest;
+import org.springframework.web.util.UriComponentsBuilder;
+
 
 @RestController
 @AllArgsConstructor
@@ -20,6 +22,7 @@ public class UserController {
 
     @GetMapping()
     public Iterable<UserDto> getAllUsers(
+            @RequestHeader(name = "x-auth-token", required = false) String authToken,
             @RequestParam(required = false, defaultValue = "", name = "sort") String sort
     ) {
         if(!Set.of("name", "email").contains(sort)){
@@ -38,6 +41,16 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(userMapper.toDto(user));
+    }
+
+    @PostMapping()
+    public ResponseEntity<UserDto> createUser(
+            @RequestBody RegisterUserRequest request,
+            UriComponentsBuilder uriBuilder) {
+        var user = userMapper.toEntity(request);
+        userRepository.save(user);
+        var uri = uriBuilder.path("/users/{id}").buildAndExpand(user.getId()).toUri();
+        return ResponseEntity.created(uri).body(userMapper.toDto(user));
     }
 
 }
