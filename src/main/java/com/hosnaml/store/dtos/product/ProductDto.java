@@ -1,6 +1,5 @@
-package com.hosnaml.store.dtos;
+package com.hosnaml.store.dtos.product;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import java.math.BigDecimal;
