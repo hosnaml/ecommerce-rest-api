@@ -1,7 +1,5 @@
 package com.hosnaml.store.controllers;
 
-import com.hosnaml.store.dtos.product.AddProductRequest;
-import com.hosnaml.store.dtos.product.UpdatedProductRequest;
 import com.hosnaml.store.mappers.ProductMapper;
 import com.hosnaml.store.repositories.CategoryRepository;
 import com.hosnaml.store.repositories.ProductRepository;
@@ -43,7 +41,7 @@ public class ProductController {
 
     @PostMapping()
     public ResponseEntity<ProductDto> createProduct(
-            @RequestBody AddProductRequest request,
+            @RequestBody ProductDto request,
             UriComponentsBuilder uriBuilder) {
         var category = categoryRepository.findById(request.getCategoryId()).orElse(null);
         if (category == null) {
@@ -52,15 +50,16 @@ public class ProductController {
         var product = productMapper.toEntity(request);
         product.setCategory(category);
         productRepository.save(product);
-        var uri = uriBuilder.path("/products/{id}").buildAndExpand(product.getId()).toUri();
-        return ResponseEntity.created(uri).body(productMapper.toDto(product));
+        request.setId(product.getId());
+        var uri = uriBuilder.path("/products/{id}").buildAndExpand(request.getId()).toUri();
+        return ResponseEntity.created(uri).body(request);
 
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductDto> updateProduct(
             @PathVariable Long id,
-            @RequestBody UpdatedProductRequest request) {
+            @RequestBody  ProductDto request) {
         var category = categoryRepository.findById(request.getCategoryId()).orElse(null);
         if (category == null) {
             return ResponseEntity.badRequest().build();
@@ -73,7 +72,8 @@ public class ProductController {
         product.setCategory(category);
         productMapper.update(request, product);
         productRepository.save(product);
-        return ResponseEntity.ok(productMapper.toDto(product));
+        request.setId(product.getId());
+        return ResponseEntity.ok(request);
     }
 
     @DeleteMapping("/{id}")
