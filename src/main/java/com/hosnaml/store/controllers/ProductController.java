@@ -3,6 +3,7 @@ package com.hosnaml.store.controllers;
 import com.hosnaml.store.dtos.product.AddProductRequest;
 import com.hosnaml.store.dtos.product.UpdatedProductRequest;
 import com.hosnaml.store.mappers.ProductMapper;
+import com.hosnaml.store.repositories.CategoryRepository;
 import com.hosnaml.store.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ public class ProductController {
 
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+    private final CategoryRepository categoryRepository;
 
     @GetMapping()
     public Iterable<ProductDto> getAllProducts(
@@ -43,7 +45,12 @@ public class ProductController {
     public ResponseEntity<ProductDto> createProduct(
             @RequestBody AddProductRequest request,
             UriComponentsBuilder uriBuilder) {
+        var category = categoryRepository.findById(request.getCategoryId()).orElse(null);
+        if (category == null) {
+            return ResponseEntity.badRequest().build();
+        }
         var product = productMapper.toEntity(request);
+        product.setCategory(category);
         productRepository.save(product);
         var uri = uriBuilder.path("/products/{id}").buildAndExpand(product.getId()).toUri();
         return ResponseEntity.created(uri).body(productMapper.toDto(product));
@@ -54,10 +61,16 @@ public class ProductController {
     public ResponseEntity<ProductDto> updateProduct(
             @PathVariable Long id,
             @RequestBody UpdatedProductRequest request) {
+        var category = categoryRepository.findById(request.getCategoryId()).orElse(null);
+        if (category == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
         var product = productRepository.findById(id).orElse(null);
         if (product == null) {
             return ResponseEntity.notFound().build();
         }
+        product.setCategory(category);
         productMapper.update(request, product);
         productRepository.save(product);
         return ResponseEntity.ok(productMapper.toDto(product));
