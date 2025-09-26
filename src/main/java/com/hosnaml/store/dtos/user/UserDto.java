@@ -1,12 +1,8 @@
-package com.hosnaml.store.dtos;
+package com.hosnaml.store.dtos.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import java.time.LocalDateTime;
-
-import java.time.LocalDate;
 
 @AllArgsConstructor
 @Getter

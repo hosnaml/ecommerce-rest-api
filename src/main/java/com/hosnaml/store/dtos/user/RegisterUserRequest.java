@@ -1,4 +1,4 @@
-package com.hosnaml.store.dtos;
+package com.hosnaml.store.dtos.user;
 
 import lombok.Data;
 
