@@ -3,6 +3,7 @@ package com.hosnaml.store.controllers;
 import com.hosnaml.store.mappers.ProductMapper;
 import com.hosnaml.store.repositories.CategoryRepository;
 import com.hosnaml.store.repositories.ProductRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class ProductController {
 
     @GetMapping()
     public Iterable<ProductDto> getAllProducts(
-            @RequestParam(required = false, name = "categoryId") Byte categoryId
+            @Valid @RequestParam(required = false, name = "categoryId") Byte categoryId
     ) {
         var products = (categoryId == null)
                ? productRepository.findAllWithCategory()
@@ -41,7 +42,7 @@ public class ProductController {
 
     @PostMapping()
     public ResponseEntity<ProductDto> createProduct(
-            @RequestBody ProductDto request,
+            @Valid @RequestBody ProductDto request,
             UriComponentsBuilder uriBuilder) {
         var category = categoryRepository.findById(request.getCategoryId()).orElse(null);
         if (category == null) {
@@ -59,7 +60,7 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<ProductDto> updateProduct(
             @PathVariable Long id,
-            @RequestBody  ProductDto request) {
+            @Valid @RequestBody  ProductDto request) {
         var category = categoryRepository.findById(request.getCategoryId()).orElse(null);
         if (category == null) {
             return ResponseEntity.badRequest().build();

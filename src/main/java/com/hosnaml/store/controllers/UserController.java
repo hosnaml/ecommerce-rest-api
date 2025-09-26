@@ -4,6 +4,7 @@ import com.hosnaml.store.dtos.user.ChangePasswordRequest;
 import com.hosnaml.store.dtos.user.UpdateUserRequest;
 import com.hosnaml.store.mappers.UserMapper;
 import com.hosnaml.store.repositories.UserRepository;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,7 @@ public class UserController {
 
     @GetMapping()
     public Iterable<UserDto> getAllUsers(
-            @RequestHeader(name = "x-auth-token", required = false) String authToken,
+            @Valid @RequestHeader(name = "x-auth-token", required = false) String authToken,
             @RequestParam(required = false, defaultValue = "", name = "sort") String sort
     ) {
         if(!Set.of("name", "email").contains(sort)){
@@ -48,7 +49,7 @@ public class UserController {
 
     @PostMapping()
     public ResponseEntity<UserDto> createUser(
-            @RequestBody RegisterUserRequest request,
+            @Valid @RequestBody RegisterUserRequest request,
             UriComponentsBuilder uriBuilder) {
         var user = userMapper.toEntity(request);
         userRepository.save(user);
@@ -57,7 +58,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable(name = "id") Long id, @RequestBody UpdateUserRequest request){
+    public ResponseEntity<UserDto> updateUser(@PathVariable(name = "id") Long id, @Valid @RequestBody UpdateUserRequest request){
         var user = userRepository.findById(id).orElse(null);
         if(user == null){
             return ResponseEntity.notFound().build();
@@ -80,7 +81,7 @@ public class UserController {
     @PostMapping("/{id}/change-password")
     public ResponseEntity<UserDto> changePassword(
             @PathVariable Long id,
-            @RequestBody ChangePasswordRequest request){
+            @Valid @RequestBody ChangePasswordRequest request){
         var user = userRepository.findById(id).orElse(null);
         if(user == null){
             return ResponseEntity.notFound().build();
