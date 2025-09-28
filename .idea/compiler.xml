@@ -11,11 +11,13 @@
         <module name="store" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="21" />
+    <bytecodeTargetLevel target="21">
+      <module name="store" target="21" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="store" options="-parameters" />
+      <module name="store" options="-parameters --release 21" />
     </option>
   </component>
 </project>
