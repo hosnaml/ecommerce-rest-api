@@ -15,15 +15,15 @@ This project is a **full-featured backend for an e-commerce application** built 
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd <project-directory>
+   git clone https://github.com/hosnaml/ecommerce-rest-api.git
+   cd ecommerce-rest-api
    ```
 
 2. Configure database connection in `application.properties`:
    ```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/<database-name>
-   spring.datasource.username=<your-username>
-   spring.datasource.password=<your-password>
+   spring.datasource.url=jdbc:mysql://localhost:3306/store_api?createDatabaseIfNotExist=true
+   spring.datasource.username=<your-sql-username>
+   spring.datasource.password=<your-sql-password>
    spring.jpa.hibernate.ddl-auto=update
    ```
 
