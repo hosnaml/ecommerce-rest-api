@@ -1,4 +1,4 @@
-package com.hosnaml.store.dtos.user;
+package com.hosnaml.store.dtos;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;

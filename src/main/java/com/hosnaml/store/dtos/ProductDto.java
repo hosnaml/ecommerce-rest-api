@@ -1,4 +1,4 @@
-package com.hosnaml.store.dtos.product;
+package com.hosnaml.store.dtos;
 
 
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.hosnaml.store.dtos.user;
+package com.hosnaml.store.dtos;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;

@@ -1,10 +1,10 @@
 package com.hosnaml.store.mappers;
 
-import com.hosnaml.store.dtos.user.UpdateUserRequest;
+import com.hosnaml.store.dtos.UpdateUserRequest;
 import org.mapstruct.Mapper;
 import com.hosnaml.store.entities.User;
-import com.hosnaml.store.dtos.user.UserDto;
-import com.hosnaml.store.dtos.user.RegisterUserRequest;
+import com.hosnaml.store.dtos.UserDto;
+import com.hosnaml.store.dtos.RegisterUserRequest;
 import org.mapstruct.MappingTarget;
 
 

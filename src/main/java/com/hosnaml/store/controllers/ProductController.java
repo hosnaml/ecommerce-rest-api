@@ -7,7 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.hosnaml.store.dtos.product.ProductDto;
+import com.hosnaml.store.dtos.ProductDto;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController

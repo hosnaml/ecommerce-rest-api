@@ -1,7 +1,7 @@
 package com.hosnaml.store.controllers;
 
-import com.hosnaml.store.dtos.user.ChangePasswordRequest;
-import com.hosnaml.store.dtos.user.UpdateUserRequest;
+import com.hosnaml.store.dtos.ChangePasswordRequest;
+import com.hosnaml.store.dtos.UpdateUserRequest;
 import com.hosnaml.store.mappers.UserMapper;
 import com.hosnaml.store.repositories.UserRepository;
 import jakarta.validation.Valid;
@@ -10,9 +10,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.hosnaml.store.dtos.user.UserDto;
+import com.hosnaml.store.dtos.UserDto;
 import java.util.Set;
-import com.hosnaml.store.dtos.user.RegisterUserRequest;
+import com.hosnaml.store.dtos.RegisterUserRequest;
 import org.springframework.web.util.UriComponentsBuilder;
 
 

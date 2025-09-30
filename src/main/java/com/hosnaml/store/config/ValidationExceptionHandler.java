@@ -12,11 +12,8 @@ import java.util.Map;
 @RestControllerAdvice
 public class ValidationExceptionHandler {
 
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationExceptions(
-            MethodArgumentNotValidException ex) {
-
+    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, Object> errors = new HashMap<>();
         errors.put("timestamp", Instant.now());
         errors.put("status", 400);
@@ -31,5 +28,13 @@ public class ValidationExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
-
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleAllExceptions(Exception ex) {
+        Map<String, Object> error = new HashMap<>();
+        error.put("timestamp", Instant.now());
+        error.put("status", 500);
+        error.put("error", "Internal Server Error");
+        error.put("message", ex.getMessage());
+        return ResponseEntity.status(500).body(error);
+    }
 }

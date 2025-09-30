@@ -1,6 +1,6 @@
 package com.hosnaml.store.mappers;
 
-import com.hosnaml.store.dtos.product.ProductDto;
+import com.hosnaml.store.dtos.ProductDto;
 import com.hosnaml.store.entities.Product;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
