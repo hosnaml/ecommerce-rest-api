@@ -1,19 +1,72 @@
-# The Ultimate Spring Boot Course
+# Spring Boot E-commerce Backend
 
-This repository contains the starter project for Part 2 of my Spring Boot course:
+This project is a **full-featured backend for an e-commerce application** built with Spring Boot. It includes user authentication, product management, a shopping cart system, checkout flow, payment integration with Stripe, and role-based access control. This project mirrors a real-world backend, demonstrating professional backend development practices.
 
-[https://codewithmosh.com/p/spring-boot-building-apis](https://codewithmosh.com/p/spring-boot-building-apis)
+## Getting Started
 
-## About this Repository 
+### Prerequisites
 
-This project is based on the final project from Part 1 of the course, but I’ve cleaned it up and removed unnecessary playground code so we can focus on building APIs in Part 2.
+- Java 17+
+- Maven
+- MySQL
+- Optional: Postman for API testing
 
-You’ll be cloning this repository and coding along with me as we extend the project.
+### Installation
 
-To get started, clone the repository to your local machine:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/hosnaml/ecommerce-rest-api.git
+   cd ecommerce-rest-api
+   ```
 
-```sh
-git clone https://github.com/mosh-hamedani/spring-api-starter
+2. Configure database connection in `application.properties`:
+   ```properties
+   spring.datasource.url=jdbc:mysql://localhost:3306/store_api?createDatabaseIfNotExist=true
+   spring.datasource.username=<your-sql-username>
+   spring.datasource.password=<your-sql-password>
+   spring.jpa.hibernate.ddl-auto=update
+   ```
 
-cd spring-api
-```
+3. Run the application:
+   ```bash
+   mvn spring-boot:run
+   ```
+
+## API Endpoints Overview
+
+### Products
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/products` | List all products |
+| GET | `/api/products/{id}` | Get product by ID |
+| POST | `/api/products` | Create product |
+| PUT | `/api/products/{id}` | Update product |
+| DELETE | `/api/products/{id}` | Delete product |
+
+### Cart
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/cart/{userId}` | Retrieve user cart |
+| POST | `/api/cart/{userId}/items` | Add product to cart |
+| PUT | `/api/cart/{userId}/items/{itemId}` | Update item quantity |
+| DELETE | `/api/cart/{userId}/items/{itemId}` | Remove item |
+| DELETE | `/api/cart/{userId}/clear` | Clear cart |
+| GET | `/api/cart/{userId}/total` | Get cart total |
+
+### Orders
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/orders/checkout` | Checkout current cart |
+| GET | `/api/orders` | Get all orders |
+| GET | `/api/orders/{id}` | Get single order |
+
+### Authentication
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/register` | Create new user |
+| POST | `/api/auth/login` | Authenticate and get JWT |
+| POST | `/api/auth/refresh` | Refresh JWT |
