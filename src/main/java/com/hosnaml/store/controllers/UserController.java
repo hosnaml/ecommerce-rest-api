@@ -2,26 +2,25 @@ package com.hosnaml.store.controllers;
 
 import com.hosnaml.store.dtos.ChangePasswordRequest;
 import com.hosnaml.store.dtos.UpdateUserRequest;
+import com.hosnaml.store.dtos.UserDto;
+import com.hosnaml.store.dtos.RegisterUserRequest;
 import com.hosnaml.store.mappers.UserMapper;
-import com.hosnaml.store.repositories.UserRepository;
+import com.hosnaml.store.services.UserService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Sort;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.hosnaml.store.dtos.UserDto;
-import java.util.Set;
-import com.hosnaml.store.dtos.RegisterUserRequest;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.Set;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final UserMapper userMapper;
 
     @GetMapping()
@@ -29,18 +28,16 @@ public class UserController {
             @Valid @RequestHeader(name = "x-auth-token", required = false) String authToken,
             @RequestParam(required = false, defaultValue = "", name = "sort") String sort
     ) {
+        // Service already validates allowed sort fields, but we mimic earlier guard to keep behavior stable
         if(!Set.of("name", "email").contains(sort)){
             sort = "name";
         }
-        return userRepository.findAll(Sort.by(sort))
-                .stream()
-                .map(userMapper::toDto)
-                .toList();
+        return userService.listUsers(sort).stream().map(userMapper::toDto).toList();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUser(@PathVariable Long id) {
-        var user = userRepository.findById(id).orElse(null);
+        var user = userService.getUser(id);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
@@ -51,30 +48,26 @@ public class UserController {
     public ResponseEntity<UserDto> createUser(
             @Valid @RequestBody RegisterUserRequest request,
             UriComponentsBuilder uriBuilder) {
-        var user = userMapper.toEntity(request);
-        userRepository.save(user);
+        var user = userService.createUser(request);
         var uri = uriBuilder.path("/users/{id}").buildAndExpand(user.getId()).toUri();
         return ResponseEntity.created(uri).body(userMapper.toDto(user));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(@PathVariable(name = "id") Long id, @Valid @RequestBody UpdateUserRequest request){
-        var user = userRepository.findById(id).orElse(null);
+        var user = userService.updateUser(id, request);
         if(user == null){
             return ResponseEntity.notFound().build();
         }
-        userMapper.update(request, user);
-        userRepository.save(user);
         return ResponseEntity.ok(userMapper.toDto(user));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<UserDto> deleteUser(@PathVariable(name = "id") Long id){
-        var user = userRepository.findById(id).orElse(null);
-        if(user == null){
+        boolean deleted = userService.deleteUser(id);
+        if(!deleted){
             return ResponseEntity.notFound().build();
         }
-        userRepository.delete(user);
         return ResponseEntity.noContent().build();
     }
 
@@ -82,16 +75,14 @@ public class UserController {
     public ResponseEntity<UserDto> changePassword(
             @PathVariable Long id,
             @Valid @RequestBody ChangePasswordRequest request){
-        var user = userRepository.findById(id).orElse(null);
-        if(user == null){
-            return ResponseEntity.notFound().build();
-        }
-        if(!user.getPassword().equals(request.getOldPassword())){
+        try {
+            var user = userService.changePassword(id, request);
+            if(user == null){
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(userMapper.toDto(user));
+        } catch (SecurityException se){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        user.setPassword(request.getNewPassword());
-        userRepository.save(user);
-        return ResponseEntity.ok(userMapper.toDto(user));
     }
-
 }

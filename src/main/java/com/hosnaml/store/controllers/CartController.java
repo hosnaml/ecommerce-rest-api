@@ -2,70 +2,64 @@ package com.hosnaml.store.controllers;
 
 import com.hosnaml.store.dtos.CartDto;
 import com.hosnaml.store.dtos.CartItemDto;
-import com.hosnaml.store.entities.Cart;
 import com.hosnaml.store.mappers.CartItemMapper;
 import com.hosnaml.store.mappers.CartMapper;
-import com.hosnaml.store.repositories.CartItemRepository;
-import com.hosnaml.store.repositories.CartRepository;
-import com.hosnaml.store.repositories.ProductRepository;
-import jakarta.validation.constraints.*;
+import com.hosnaml.store.services.CartService;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/carts")
 public class CartController {
 
-
-    private final CartRepository cartRepository;
-    private final CartItemRepository cartItemRepository;
-    private final ProductRepository productRepository;
+    private final CartService cartService;
     private final CartMapper cartMapper;
     private final CartItemMapper cartItemMapper;
 
-    private Cart createCartIfNotExist(Long userId) {
-        return cartRepository.findByUserId(userId)
-                .orElseGet(() -> {
-                    Cart newCart = new Cart();
-                    newCart.setUserId(userId);
-                    newCart.setCreatedAt(LocalDateTime.now());
-                    return cartRepository.save(newCart);
-                });
-    }
-
     @GetMapping("/{userId}")
     public ResponseEntity<CartDto> getCart(@PathVariable Long userId) {
-        var cart = createCartIfNotExist(userId);
+        var cart = cartService.getOrCreate(userId);
         return ResponseEntity.ok(cartMapper.toDto(cart));
     }
-
 
     @PostMapping("/{userId}/items")
     public ResponseEntity<CartItemDto> addToCart(@PathVariable Long userId,
                                                  @RequestParam @NotNull Long productId,
-                                                 @RequestParam  @Min(1) int quantity) {
-        var cart = createCartIfNotExist(userId);
-        var product = productRepository.findById(productId).orElse(null);
-        if (product == null || quantity <= 0) {
+                                                 @RequestParam @Min(1) int quantity) {
+        var item = cartService.addItem(userId, productId, quantity);
+        return ResponseEntity.ok(cartItemMapper.toDto(item));
+    }
+
+    @PutMapping("/{userId}/items/{productId}")
+    public ResponseEntity<CartItemDto> updateCartItem(@PathVariable Long userId,
+                                                      @PathVariable Long productId,
+                                                      @RequestParam @NotNull @Min(1) int quantity) {
+        try {
+            var item = cartService.updateQuantity(userId, productId, quantity);
+            return ResponseEntity.ok(cartItemMapper.toDto(item));
+        } catch (IllegalArgumentException ex) {
+            // Differentiate not found vs invalid quantity via message
+            if (ex.getMessage() != null && ex.getMessage().toLowerCase().contains("not found")) {
+                return ResponseEntity.notFound().build();
+            }
             return ResponseEntity.badRequest().build();
         }
-        var cartItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), productId)
-                .map(item -> {
-                    item.setQuantity(item.getQuantity() + quantity);
-                    return cartItemRepository.save(item);
-                })
-                .orElseGet(() -> {
-                    var newItem = new com.hosnaml.store.entities.CartItem();
-                    newItem.setCart(cart);
-                    newItem.setProduct(product);
-                    newItem.setQuantity(quantity);
-                    newItem.setUnitPrice(product.getPrice());
-                    return cartItemRepository.save(newItem);
-                });
-        return ResponseEntity.ok(cartItemMapper.toDto(cartItem));
+    }
+
+    @DeleteMapping("/{userId}/items/{productId}")
+    public ResponseEntity<Void> removeFromCart(@PathVariable Long userId,
+                                               @PathVariable Long productId) {
+        cartService.removeItem(userId, productId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> clearCart(@PathVariable Long userId) {
+        cartService.clearCart(userId);
+        return ResponseEntity.noContent().build();
     }
 }

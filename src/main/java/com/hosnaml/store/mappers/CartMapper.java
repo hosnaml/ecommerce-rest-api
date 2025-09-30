@@ -1,7 +1,6 @@
 package com.hosnaml.store.mappers;
 
 import com.hosnaml.store.dtos.CartDto;
-import com.hosnaml.store.dtos.CartItemDto;
 import com.hosnaml.store.entities.Cart;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;

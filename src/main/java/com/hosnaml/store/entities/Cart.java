@@ -1,13 +1,11 @@
 package com.hosnaml.store.entities;
 
 import jakarta.persistence.*;
-import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import com.hosnaml.store.entities.CartItem;
+
 
 @Getter
 @Setter
